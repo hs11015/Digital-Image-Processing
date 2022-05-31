@@ -1,4 +1,4 @@
-# Digital-Image-Processing - skin detection
+# Digital-Image-Processing - differential operator
 
 1. Prewitt, Sobel과 같은 1차 미분 연산자
 
