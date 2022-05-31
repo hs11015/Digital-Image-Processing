@@ -1,4 +1,4 @@
-# Digital-Image-Processing
+# Digital-Image-Processing - skin detection
 
 우선 C드라이브>사용자>hs11015 에 opencv라는 하위 폴더를 하나 만들어주고, 결과를 볼 수 있는 사진을 3개정도 저장을 하였다.
 <br/>
