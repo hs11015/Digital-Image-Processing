@@ -222,3 +222,298 @@ Fig0510(a)(ckt-board-saltpep-prob.pt05).jpg median 1, mean, gaussian, madians 4,
 Median 값들은 중앙 값이라 자기 자신을 중앙값으로 가질 확률이 아무래도 크기 때문에 변화가 전혀 없다. 따라서 이후 이 사진을 비교할 때는 Mean 값과 Gaussian 값만 비교하려고 한다.
 
 ![image](https://user-images.githubusercontent.com/79328858/171149956-c794bf97-e4f8-427c-a334-8dd5b33f95fc.png)
+
+  
+  <결과 8>
+크기를 조금 늘려서 3*3에서 7*7으로 늘려봤다. Mean값이 Gaussian값보다 훨씬 블러처리가 많이 된 것을 알 수 있다. 
+
+    
+사진 예시 : Fig0503 (original_pattern).jpg
+
+
+
+(추가 사진 예시 Fig0507(a)(ckt-board-orig).jpg)
+
+보다 확연하게 보기 위해 15*15의 크기를 갖는 filter를 만들어보았다.
+
+
+사진 예시 : Fig0503 (original_pattern).jpg
+
+
+(추가 사진 예시 Fig0507(a)(ckt-board-orig).jpg)
+
+
+확실히 Mean filter가 gaussian filter보다 블러처리에는 효과가 있는 것 같다.
+하지만 경계선을 최대한 덜 흐리게 하고, 블러처리를 하기 위해서는 Gaussian filter를 이용하는 것이 좋다는 것도 이번 결과를 통해 알 수 있었다.
+
+<결론>
+noise가 없는 original 사진에서는 Median Filter는 original 값 그대로를 출력하고, Gaussian filter는 적당히 블러된 값을, Mean Filter는 완전히 블러 처리된 값을 출력한다. 이 때 mask의 크기가 커지면 커질 수록 결과값의 강도도 세지게 된다.
+
+Gaussian noise의 경우 gaussian filter 또는 median filter가 가장 블러처리가 잘 된다고 볼 수 있다. gaussian filter는 시그마 값이 커질 수록 더 부드러운 값을 낼 수 있게 된다(브럴 처리의 강도가 세진다)
+
+Salt&pepper noise의 경우 Median filter를 써야한다. 0과 1을 값으로 갖는 픽셀들이 산발적으로 위치하고 있기 때문에 이 공백을 중앙값으로 메우기 위해서는 median filter가 가장 좋은 기능을 한다.
+
+
+
+
+
+
+
+
+
+
+
+1. Apply average filter to given color image
+
+위에서도 한 번 언급했었지만 Median filter는 color image에 적용하는 경우가 드물다. 아무리 퀵소팅을 사용하더라도 중앙값을 한 픽셀마다 구하는 연산에 많은 시간이 걸리기 때문이다. 또한, Median filter의 경우 원본의 RGB 값을 각각 받아서 중앙값을 취해오는 것이기 때문에 동일한 픽셀에서 중앙값을 취해오지 않을 수도 있다.
+예를 들어 설명을 해보자면 만약 mask가 3*3인 filter를 이용해 R, G, B 각각의 중앙값을 가져오려고 했을 때 아래 사진처럼 각각 다른 픽셀에서 값을 가져와 아예 다른 색의 픽셀 값을 구성하게 되게된다. 원래 이미지에서는 R:100, G:20, B:150이었던 픽셀이지만 필터를 통과하면서 [0][0]에 있던 R: 255, [1][1]에 있던 B: 150, [2][2]에 있던 G:140을 취해와아예 다른 색의 pixel을 구성하게 되고, 이런 결과값들이 모여 하나의 이미지를 구성하게 되면 원래 이미지와 비교해보았을 때 전혀 다른 이미지를 구성하게 될 수 있다.
+
+위에 서술한 이유 때문에 원본과 이미지가 확연히 달라질 수도 있는 Meaidn filter는 제외하고, 3번 color image에서는 mean filter와 gaussian filterd의 결과값들만을 위주로 서술할 것이다.
+
+1) HSI 사용하지 않고 바로 Channel 값에 넣기
+  1.과 2.에서 썼던 코드와 동일한 코드. channel 값에 바로 적용시켜주는 경우이다.
+color 이미지와 흑백 이미지는 모두 동일한 특성을 가지고 있을 것으로 예상한다.
+
+시작 전, 교수님께서 제공해주신 Lena_noise.png와 Gaussian noise.png의 값이 바뀌었다는 글을 보고 임의로 그림 파일을 바꿔 진행했다.
+i) 3*3, 가우시안 시그마 : 3 
+
+Lena_noise.png
+원본에 비해 노이즈가 크게 줄지는 않았다. mean과 gaussian 사이 큰 차이는 없다.
+
+Gaussian noise.png
+원본에 비해 mean filter와 gaussian filter 모두 노이즈가 줄었다. mean과 gaussian간의 차이는 크게 보이지 않는다.
+
+Salt&pepper noise
+mean과 gaussian 사이 큰 차이는 없이 원본과 달라진 것 거의 없이 그대로이다.
+
+
+
+  ii) 5*5, 가우시안 시그마 : 3
+
+Lena_noise.png
+원본에 비해 노이즈가 크게 줄지는 않았지만 mean과 gaussian 모두 조금 부드러워졌다.
+
+Gaussian noise.png
+원본에 비해 mean filter와 gaussian filter 모두 노이즈가 줄었고, mean filter을 사용했을 때의 결과 값이 gaussian filter을 사용했을 때의 결과값보다 좀 더 흐리게 나온다.
+
+Salt&pepper noise
+실제 내 화면에 출력되는 사진으로 보면 mean filter의 경우 original 이미지보다 확실히 blur처리가 되고 있고, gaussian filter 역시 smoothing은 되고 있지만 mean filter가 gaussian filter보다는 좀 더 효과적이다. 하지만 보고서에  사진을 넣으니 사진이 작아져서 그대로인 것처럼 보인다...
+
+  iii) 7*7, 가우시안 시그마 : 3
+
+Lena_noise.png
+mean과 gaussian 사이 큰 차이는 없지만 mean이 gaussian보다는 좀 더 noise가 적다.
+
+Gaussian noise.png
+mean filter의 경우 많이 흐려졌고, gaussian filter의 경우 노이즈도 많이 제거되고 사진이 부드러워졌다.
+
+Salt&pepper noise
+mean filter의 경우 확실히 original image보다 많이 부드러워지고 노이즈도 많이 걷혔다. gaussian의 경우에도 original image와 비교했을 때는 부드러워지고 노이즈도 많이 없어졌다. 하지만 mean filter와 비교해보았을 때 Gaussian filter는 아직 많이 sharp하다.
+
+
+  iv) 5*5, 가우시안 시그마 변화 주기 : 순서대로 1, 3, 5
+
+Lena_noise.png
+큰 차이는 없지만, 시그마의 값이 커질수록 사진이 smoothing 되기 때문에 노이즈가 조금씩 줄어드는 것으로 보인다.
+
+Gaussian noise.png
+Gaussian filter의 경우 mask의 크기는 그대로여도 시그마의 값이 커질수록 노이즈가 더 줄어들고, 사진이 부드러워진다는 것을 알 수 있다.
+
+Salt&pepper noise
+보고서에 사진을 넣으니 크기가 줄어들어 노이즈가 커 보이지만, 확실히 시그마의 크기가 커지면 커질 수록 noise의 양상은 줄어드는 것을 확인할 수 있다.
+
+2) HSI 사용해 I 값을 수정하고 RGB 값으로 변환해 값에 넣기
+  1.과 2.에서 썼던 코드와는 달리 기존 원본에 있던 RGB 값을 HSI로 변환한 후 I 값을 수정하여 HSI를 다시 RGB 값으로 바꿔 결과 사진을 도출해내는 코드이다.
+
+i) 3*3, 가우시안 시그마 : 3 
+
+Lena_noise.png
+원본 이미지와 Mean filter, Gaussian filter를 적용했을 때의 결과 값에 큰 차이가 없다.
+
+Gaussian noise.png
+Mean filter가 Gaussian filter보다 노이즈를 조금 더 감소시킨 것을 확인할 수 있다.
+
+Salt&pepper noise
+원본 이미지와 Mean filter, Gaussian filter를 적용했을 때의 결과 값에 큰 차이가 없다.
+
+  ii) 5*5, 가우시안 시그마 : 3
+
+Lena_noise.png
+원본 이미지에 비해 Mean filter, Gaussian filter 모두 조금씩 smoothing 된 결과를 추출했음을 확인할 수 있다.
+
+Gaussian noise.png
+원본 이미지에 비해 Mean filter의 경우 많이 흐려졌다. 노이즈는 거의 제거된 것처럼 보이고, 모자와 배경 사이처럼 사진 내의 경계선(edge)이 점점 흐려지고 있다. Gaussian filter를 적용했을 때는 noise는 많이 사라진 것으로 보이고, 경계선 또한 mean filter와 비교했을 때 잘 보존되고 있음을 확인 할 수 있다.
+
+Salt&pepper noise
+큰 차이가 없어 보이지만 Mean filter의 경우 노이즈를 포함한 이미지가 모두 smoothing 되었음을 확인할 수 있다. Gaussian filter의 경우도 원본 이미지보다는 smoothing 되었다.
+  iii) 7*7, 가우시안 시그마 : 3
+
+Lena_noise.png
+Mean filter와 Gaussian filter 모두 원본 이미지와 비교했을 때 smoothing 되었다. mean filter와 gaussian filter만 놓고 보면 mean filter가 조금 더 smoothing된 양상을 띠고 있다.
+
+Gaussian noise.png
+Mean filter의 경우 5*5에서보다 더 흐려졌다. 노이즈는 거의 제거되고 경계선(edge)이 완전 흐려져 초점이 맞지 않는 것처럼 보인다. Gaussian filter를 적용했을 때 noise는 거의 사라졌고, 경계선 또한 mean filter와 비교했을 때 잘 보존되고 있음을 확인 할 수 있다.
+
+Salt&pepper noise
+원본 사진이 워낙 크다보니 보고서에 사진을 첨부했을 때 큰 차이가 없어 보인다. 하지만 mean filter의 경우 원본 사진보다 많이 smoothing 되었고, gaussian filter 역시 mean filter보다는 아니지만 많이 smoothing 되었음을 알 수 있다.
+  iv) 5*5, 가우시안 시그마 변화 주기 : 순서대로 1, 3, 5
+
+Lena_noise.png -> 차이를 잘 보이게 하기 위해 원본 사진 사이즈를 줄였음
+
+Gaussian noise.png
+
+Salt&pepper noise -> 차이를 잘 보이게 하기 위해 원본 사진 사이즈를 줄였음
+
+세 이미지에서 모두 나타나듯 가우시안 시그마를 높일수록 사진이 더 smoothing 됨을 알 수 있다. 노이즈도 옅어짐과 동시에 사진의 edge(경계선)도 흐려진다.
+
+
+
+
+
++) 위 i)~iii)까지 썼던 Lena_noise와 Salt&pepper noise의 차이가 보고서에서 잘 보이지 않아 원본 사진의 사이즈를 줄여 3*3, 7*7 mask만 한 번 돌려보았다. (이때, 가우시안 시그마 값은 3으로 고정)
+
+3*3 : Lena_noise.png -> 차이를 잘 보이게 하기 위해 원본 사진 사이즈를 줄였음
+
+7*7 : Lena_noise.png -> 차이를 잘 보이게 하기 위해 원본 사진 사이즈를 줄였음
+
+원본 사이즈를 줄여서 보니(전체 픽셀의 개수가 적어짐) 확실히 사진을 추출해내는 시간도 줄어들었다. 사진 이야기로 돌아와서, 마스크의 사이즈를 크게 해서 적용할 수록 smoothing 되는 정도가 커진다는 것을 알 수 있었다. 또한, mean filter가 gaussian filter보다 더 많이 블러처리 되었음을 알 수 있었다.
+노이즈를 제거함과 동시에 edge(경계선)도 보존을 하려면 gaussian filter를, 
+단순히 noise만 제거하고 edge(경계선)의 보존 여부는 상관이 없이 사진을 블러처리하는 것이 목적이라면 mean filter를 쓰는 것이 낫다.
+
+
+3*3 : Salt&pepper noise -> 차이를 잘 보이게 하기 위해 원본 사진 사이즈를 줄였음
+
+7*7 : Salt&pepper noise -> 차이를 잘 보이게 하기 위해 원본 사진 사이즈를 줄였음
+
+salt&pepper noise 역시 마스크의 사이즈를 크게 해서 적용할 수록 smoothing 되는 정도가 커진다는 것을 알 수 있었다. 또한, mean filter가 gaussian filter보다 더 많이 블러처리 되었음을 알 수 있었다.
+하지만 sal&pepper noise의 경우 mean filter와 gaussian filter 두 개로는 noise를 조금 흐리게 할 뿐 완벽히 제거할 수 없다. edge(경계선)도 보존을 하면서 noise를 줄이고 싶다면 gaussian filter를, edge(경계선)의 보존 여부는 상관이 없이 noise를 많이 흐리게 하는 것이 목적이라면 mean filter를 쓰는 것이 낫다.
+
+
+2. Apply the High-boost filter to some image
+
+첫 시작은 library를 불러오고 mask의 높이와 너비, A 값을 입력 받는 것으로 한다.
+
+
+high-boost filtering 중 ① 상하좌우에만 mask를 적용시키는 함수를 mask_highpass1,
+② 상하좌우 대각선 모두에 mask를 적용시키는 함수를 mask_highpass2로 선언했다.
+  
+
+
+
+
+
+
+
+① mask_highpass_1
+
+우선 이렇게 마스크의 크기가 3*3→5*5→7*7→... 으로 커질 수록 다이아몬드 형태로 마스크를 적용하는 filter를 만들기로 했다.
+
+
+
+highpass를 적용시키기 위해 원본 이미지의 BGR을 HSI로 변환하는 과정을 거쳤다.
+Intensity에만 mask를 적용시킨 후 다시 BGR 값으로 변환하면 sharpening된 결과 이미지를 추출할 수 있다는 생각에 시작했다.
+
+
+우선 위에서 설명한대로 다이아몬드 형태로 mask filter를 만든다.
+
+
+
+그 후 if i<maskheight or i>height-maskheight or j<maskwidth or j>width-maskwidth
+문을 넣어서 위아래로 maskheight 길이보다 짧은 곳, 좌우로 maskwidth보다 짧은 곳에는 mask를 적용하지 않고, 원래 값을 취하고 mask를 움직이도록 설정했다.
+Hue 값의 범위에 따라 BGR 값을 구하는 식이 달라지기 때문에 H[i][j]의 범위에 따라 식을 수정하였다
+
+
+다음 코드는 mask가 적용되는 곳의 값이다. hsi2B, hsi2G, hsi2R에 각각 원본 사진의 Indensity에 mask를 적용한 pixel 값들을 적용해 더해준다
+
+모든 mask를 적용한 pixel들의 합이 plt[i][j](결과 이미지의 i+1행 j+1열 pixel 값)이 됨
+
+
+② mask_highpass_2
+
+우선 이렇게 마스크의 크기가 3*3→5*5→7*7→... 으로 커지면 mask의 모든 pixel만큼 square 형태로 마스크를 적용하는 filter를 만들기로 했다.
+
+
+
+mask_highpass_1 함수와 다른 점은 mask 범위밖에 없다. 모든 픽셀을 mask에 적용시키기 위해 위처럼 mask를 만들어준다.(origin pixel 빼고 모두 –1)
+
+
+이후 main cell
+
+highpass1과 highpass2를 만들어서 각각 다른 mask를 적용시킨 결과값을 출력하도록 한다.
+
+
+
+
+
+
+<결과 1> 원본 / origin pixel과 상하좌우만 mask / origin pixel과 상하좌우대각선 mask
+
+mask의 크기는 3*3으로 동일하게 하고 A의 크기를 1, 1.2, 1.4로 늘려가며 결과를 비교하였다.
+
+1) 3*3 mask / A = 1
+
+
+
+
+
+
+2) 3*3 mask / A = 1.2
+
+
+
+
+
+
+
+
+
+
+3) 3*3 mask / A = 1.4
+
+
+
+
+
+A의 크기가 커질 수록 밝은 부분이 더 밝아져 더 선명하게 보인다.
+mask들의 비교에서는 상하좌우만 mask 값을 적용한 것보다 상하좌우 대각선 모두 mask 값을 적용했을 때 더욱 sharpening 되었다는 걸 알 수 있다.
+<결과 2> 원본 / origin pixel과 상하좌우만 mask / origin pixel과 상하좌우대각선 mask
+
+mask의 크기는 5*5으로 동일하게 하고 A의 크기를 1, 1.2, 1.4로 늘려가며 결과를 비교하였다.
+
+1) 5*5 mask / A = 1
+
+
+
+
+
+
+2) 5*5 mask / A = 1.2
+
+
+
+
+
+
+
+
+
+
+
+3) 5*5 mask / A = 1.4
+
+
+
+
+
+A의 크기가 커질 수록 밝은 부분이 더 밝아져 더 선명하게 보인다는 것과
+상하좌우만 mask 값을 적용한 것보다 상하좌우 대각선 모두 mask 값을 적용했을 때가 sharpening에 더 효과적이라는 것은 mask의 크기가 3*3일 때와 동일하다
+또 마스크의 크기가 커질수록 sharpening이 더 많이 된다는 것 또한 알 수 있다.
+
+
+위에서 내가 보인 것은 밝은 부분을 Sharpening 시킬 수 있는 High-boost를 구현한 거라High-boost = A*Original + Highpass이다.
+여기서 Mask의 모양, filter만 바꾸면 어두운 부분을 Sharpening 시길 수 있는 High-boost 또한 구현이 가능하다. High-boost = A*Original – Lowpass이다.
+
+
+이때 lowpass가 될 수 있는 값은 mean filter, gaussian filter 등이다.
+  
+  
